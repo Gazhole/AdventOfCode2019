@@ -10,7 +10,12 @@ def load(path):
 
 
 def calculate_fuel(module):
-    return int(module / 3) - 2
+    total_fuel = 0
+    fuel = int(module / 3) - 2
+    while fuel > 0:
+        total_fuel += fuel
+        fuel = int(fuel / 3) - 2
+    return total_fuel
 
 
 def main():
