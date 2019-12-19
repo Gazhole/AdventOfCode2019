@@ -4,6 +4,24 @@ Day 5
 """
 
 
+def increment_i(opcode, out_pos, i):
+    pos_jumps = dict()
+    pos_jumps[1] = 4
+    pos_jumps[2] = 4
+    pos_jumps[3] = 2
+    pos_jumps[4] = 2
+    pos_jumps[5] = 4
+    pos_jumps[6] = 4
+    pos_jumps[7] = 4
+    pos_jumps[8] = 4
+    pos_jumps[99] = 0
+
+    if out_pos == i:
+        return 0
+    else:
+        return pos_jumps[opcode]
+
+
 def get_input_param(program, param_num, i, mode):
     if mode == 0:
         value = program[program[i + param_num]]
@@ -22,44 +40,42 @@ def get_output_pos(program, param_num, i, mode):
     return pos
 
 
-def opcode_1(program, i, param_1_mode, param_2_mode, param_3_mode):
-
+def opcode_1(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     in_1_value = get_input_param(program, 1, i, param_1_mode)
     in_2_value = get_input_param(program, 2, i, param_2_mode)
     out_pos = get_output_pos(program, 3, i, param_3_mode)
 
     program[out_pos] = int(in_1_value) + int(in_2_value)
 
-    return 4
+    return increment_i(opcode, out_pos, i)
 
 
-def opcode_2(program, i, param_1_mode, param_2_mode, param_3_mode):
-
+def opcode_2(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     in_1_value = get_input_param(program, 1, i, param_1_mode)
     in_2_value = get_input_param(program, 2, i, param_2_mode)
     out_pos = get_output_pos(program, 3, i, param_3_mode)
 
     program[out_pos] = int(in_1_value) * int(in_2_value)
 
-    return 4
+    return increment_i(opcode, out_pos, i)
 
 
-def opcode_3(program, i, param_1_mode, param_2_mode, param_3_mode):
+def opcode_3(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     out_pos = get_output_pos(program, 1, i, param_1_mode)
     in_1_value = input(">")
 
     program[out_pos] = in_1_value
 
-    return 2
+    return increment_i(opcode, out_pos, i)
 
 
-def opcode_4(program, i, param_1_mode, param_2_mode, param_3_mode):
+def opcode_4(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     print(program[program[i + 1]])
 
-    return 2
+    return increment_i(opcode, False, i)
 
 
-def opcode_5(program, i, param_1_mode, param_2_mode, param_3_mode):
+def opcode_5(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     in_1_value = get_input_param(program, 1, i, param_1_mode)
     in_2_value = get_input_param(program, 2, i, param_2_mode)
 
@@ -67,10 +83,10 @@ def opcode_5(program, i, param_1_mode, param_2_mode, param_3_mode):
         pos_jump = in_2_value - i
         return pos_jump
     else:
-        return 0
+        return 3
 
 
-def opcode_6(program, i, param_1_mode, param_2_mode, param_3_mode):
+def opcode_6(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     in_1_value = get_input_param(program, 1, i, param_1_mode)
     in_2_value = get_input_param(program, 2, i, param_2_mode)
 
@@ -78,21 +94,39 @@ def opcode_6(program, i, param_1_mode, param_2_mode, param_3_mode):
         pos_jump = in_2_value - i
         return pos_jump
     else:
-        return 0
+        return 3
 
 
-def opcode_7(program, i, param_1_mode, param_2_mode, param_3_mode):
-    pass
+def opcode_7(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
+    in_1_value = get_input_param(program, 1, i, param_1_mode)
+    in_2_value = get_input_param(program, 2, i, param_2_mode)
+    out_pos = get_output_pos(program, 3, i, param_3_mode)
+
+    if in_1_value < in_2_value:
+        program[out_pos] = 1
+    else:
+        program[out_pos] = 0
+
+    return increment_i(opcode, out_pos, i)
 
 
-def opcode_8(program, i, param_1_mode, param_2_mode, param_3_mode):
-    pass
+def opcode_8(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
+    in_1_value = get_input_param(program, 1, i, param_1_mode)
+    in_2_value = get_input_param(program, 2, i, param_2_mode)
+    out_pos = get_output_pos(program, 3, i, param_3_mode)
+
+    if in_1_value == in_2_value:
+        program[out_pos] = 1
+    else:
+        program[out_pos] = 0
+
+    return increment_i(opcode, out_pos, i)
 
 
-def opcode_99(program, i, param_1_mode, param_2_mode, param_3_mode):
+def opcode_99(opcode, program, i, param_1_mode, param_2_mode, param_3_mode):
     print(program)
 
-    return 0
+    return increment_i(opcode, False, i)
 
 
 def parse_opcode(opcode):
@@ -121,6 +155,10 @@ def parse_program(program):
     opcodes[2] = opcode_2
     opcodes[3] = opcode_3
     opcodes[4] = opcode_4
+    opcodes[5] = opcode_5
+    opcodes[6] = opcode_6
+    opcodes[7] = opcode_7
+    opcodes[8] = opcode_8
     opcodes[99] = opcode_99
 
     i = 0
@@ -128,7 +166,7 @@ def parse_program(program):
         opcode, param_1_mode, param_2_mode, param_3_mode = parse_opcode(program[i])
 
         f = opcodes[opcode]
-        pos_jump = f(program, i, param_1_mode, param_2_mode, param_3_mode)
+        pos_jump = f(opcode, program, i, param_1_mode, param_2_mode, param_3_mode)
 
         if program[i] == 99:
             break
